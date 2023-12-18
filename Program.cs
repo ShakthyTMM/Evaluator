@@ -1,4 +1,12 @@
-﻿namespace Eval;
+﻿// ----------------------------------------------------------------------------------------
+// Training 
+// Copyright (c) Metamation India.
+// ----------------------------------------------------------------------------------------
+// Program.cs
+// Expression evaluator
+// Implementation of unary operator in the expression evaluator
+// ----------------------------------------------------------------------------------------
+namespace Eval;
 
 class Program {
    static void Main (string[] args) {

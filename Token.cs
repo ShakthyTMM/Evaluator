@@ -25,6 +25,7 @@ class TVariable : TNumber {
 abstract class TOperator : Token {
    protected TOperator (Evaluator eval) => mEval = eval;
    public abstract int Priority { get; }
+   public virtual int FinalPriority { get; set; }
    readonly protected Evaluator mEval;
 }
 
@@ -32,7 +33,7 @@ class TOpArithmetic : TOperator {
    public TOpArithmetic (Evaluator eval, char ch) : base (eval) => Op = ch;
    public char Op { get; private set; }
    public override string ToString () => $"op:{Op}:{Priority}";
-   public override int Priority => sPriority[Op] + mEval.BasePriority;
+   public override int Priority => sPriority[Op];
    static Dictionary<char, int> sPriority = new () {
       ['+'] = 1, ['-'] = 1, ['*'] = 2, ['/'] = 2, ['^'] = 3, ['='] = 4,
    };
@@ -53,7 +54,7 @@ class TOpFunction : TOperator {
    public TOpFunction (Evaluator eval, string name) : base (eval) => Func = name;
    public string Func { get; private set; }
    public override string ToString () => $"func:{Func}:{Priority}";
-   public override int Priority => 4 + mEval.BasePriority;
+   public override int Priority => 4;
 
    public double Evaluate (double f) {
       return Func switch {
@@ -74,6 +75,27 @@ class TOpFunction : TOperator {
    }
 }
 
+/// <summary>Derived class from the base class TOperator which returns the unary operators</summary>
+class TOpUnary : TOperator {
+   public TOpUnary (Evaluator eval, char op) : base (eval) => mOp = op;
+
+   /// <summary>Returns the priority of the operator</summary>
+   public override int Priority => 4;
+
+   /// <summary>Applies the operation based on the operator</summary>
+   /// <param name="a">Operand to be evaluated</param>
+   /// <returns>Returns the result of the operation</returns>
+   /// <exception cref="NotImplementedException"></exception>
+   public double Apply (double a)
+       => mOp switch {
+          '+' => a,
+          '-' => -a,
+          _ => throw new NotImplementedException ()
+       };
+
+   public char Op => mOp;
+   readonly char mOp;
+}
 class TPunctuation : Token {
    public TPunctuation (char ch) => Punct = ch;
    public char Punct { get; private set; }
