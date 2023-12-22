@@ -52,7 +52,7 @@ class Tokenizer {
       int start = mN - 1;
       char ch = mText[start];
       if (ch is '+' or '-') {
-         if (start is 0 || (mText[--start] is '+' or '-' or '*' or '/' or '^' or '=' or '(' or ' ' or >= 'a' and <= 'z')) return new TOpUnary (mEval, ch);
+         if (start is 0 || (mText[--start] is '+' or '-' or '*' or '/' or '^' or '=' or '(' or ' ')) return new TOpUnary (mEval, ch);
          if (mText[mN] is '+' or '-') {
             char a = ch == mText[mN] ? '+' : '-';
             mN++;

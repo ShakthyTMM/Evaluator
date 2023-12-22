@@ -13,7 +13,7 @@ class Program {
       var eval = new Evaluator ();
       for (; ; ) {
          Console.Write ("> ");
-         string text = Console.ReadLine () ?? "";
+         string text = Console.ReadLine ();
          if (text == "exit") break;
          try {
             double result = eval.Evaluate (text);
