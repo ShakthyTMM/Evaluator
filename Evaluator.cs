@@ -23,9 +23,10 @@ class Evaluator {
       }
       foreach (var t in tokens) Process (t);
       while (mOperators.Count > 0) ApplyOperator ();
+      if (BasePriority != 0) throw new EvalException ("Mismatched Parentheses");
       double f = mOperands.Pop ();
       if (tVariable != null) mVars[tVariable.Name] = f;
-      return f; 
+      return f;
    }
 
    public int BasePriority { get; private set; }
@@ -38,11 +39,12 @@ class Evaluator {
 
    void Process (Token token) {
       switch (token) {
-         case TNumber num: 
-            mOperands.Push (num.Value); 
+         case TNumber num:
+            mOperands.Push (num.Value);
             break;
          case TOperator op:
-            while (mOperators.Count > 0 && mOperators.Peek ().Priority <= op.Priority)
+            op.FinalPriority = op.Priority + BasePriority;
+            while (mOperators.Count > 0 && mOperators.Peek ().FinalPriority > op.FinalPriority)
                ApplyOperator ();
             mOperators.Push (op);
             break;
@@ -53,6 +55,7 @@ class Evaluator {
             throw new EvalException ($"Unknown token: {token}");
       }
    }
+
    readonly Stack<double> mOperands = new ();
    readonly Stack<TOperator> mOperators = new ();
 
@@ -63,6 +66,9 @@ class Evaluator {
       else if (op is TOpArithmetic arith) {
          var f2 = mOperands.Pop ();
          mOperands.Push (arith.Evaluate (f2, f1));
+      }
+      if (op is TOpUnary unary) {
+         mOperands.Push (unary.Apply (f1));
       }
    }
 }
